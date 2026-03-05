@@ -1,0 +1,222 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>Student Digital Schedule</title>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<style>
+body{
+    margin:0;
+    font-family: 'Segoe UI', sans-serif;
+    background: linear-gradient(-45deg,#6a11cb,#2575fc,#ff6ec4,#7873f5);
+    background-size:400% 400%;
+    animation:gradientMove 10s ease infinite;
+    min-height:100vh;
+    display:flex;
+    justify-content:center;
+    align-items:center;
+}
+@keyframes gradientMove{
+    0%{background-position:0% 50%;}
+    50%{background-position:100% 50%;}
+    100%{background-position:0% 50%;}
+}
+
+.container{
+    width:95%;
+    max-width:750px;
+}
+
+.card{
+    backdrop-filter: blur(15px);
+    background: rgba(255,255,255,0.15);
+    border-radius:20px;
+    padding:25px;
+    margin-bottom:20px;
+    color:white;
+    box-shadow:0 8px 30px rgba(0,0,0,0.3);
+    animation:fadeIn 0.6s ease;
+}
+
+h2,h3{
+    text-align:center;
+}
+
+input{
+    width:100%;
+    padding:12px;
+    margin:8px 0;
+    border-radius:12px;
+    border:none;
+    outline:none;
+}
+
+button{
+    width:100%;
+    padding:12px;
+    border:none;
+    border-radius:12px;
+    background:#ffffff;
+    color:#333;
+    font-weight:bold;
+    cursor:pointer;
+    transition:0.3s;
+}
+
+button:hover{
+    background:#f1f1f1;
+    transform:scale(1.03);
+}
+
+.schedule-item{
+    background:rgba(255,255,255,0.2);
+    padding:10px;
+    border-radius:10px;
+    margin:6px 0;
+}
+
+.notification{
+    background:rgba(255,255,0,0.3);
+    padding:10px;
+    border-radius:10px;
+    margin-top:10px;
+}
+
+.hidden{
+    display:none;
+}
+
+.logout{
+    background:#ff4b5c;
+    color:white;
+    margin-top:10px;
+}
+
+@keyframes fadeIn{
+    from{opacity:0; transform:translateY(15px);}
+    to{opacity:1; transform:translateY(0);}
+}
+</style>
+</head>
+
+<body>
+
+<div class="container">
+
+<!-- LOGIN -->
+<div class="card" id="loginPage">
+<h2>📚 Student Login</h2>
+<input type="text" id="name" placeholder="Your Name">
+<input type="text" id="class" placeholder="Your Class">
+<input type="password" id="password" placeholder="Password">
+<button onclick="login()">Login</button>
+</div>
+
+<!-- DASHBOARD -->
+<div id="dashboard" class="hidden">
+
+<div class="card">
+<h2>👋 Welcome <span id="studentName"></span></h2>
+<p style="text-align:center;">Class: <b id="studentClass"></b></p>
+<button class="logout" onclick="logout()">Logout</button>
+</div>
+
+<div class="card">
+<h3>📅 Today's Schedule</h3>
+<div id="scheduleList"></div>
+<button onclick="simulateChange()">Simulate Class Change</button>
+<div id="notificationArea"></div>
+</div>
+
+<div class="card">
+<h3>📝 Homework Reminder</h3>
+<input type="text" id="hwText" placeholder="Homework Description">
+<input type="datetime-local" id="hwTime">
+<button onclick="addHomework()">Add Homework</button>
+<div id="hwList"></div>
+</div>
+
+</div>
+
+</div>
+
+<script>
+
+let schedules=[
+    {time:"07:30 - 08:30", subject:"Mathematics"},
+    {time:"08:30 - 09:30", subject:"English"},
+    {time:"09:30 - 10:30", subject:"Biology"}
+];
+
+function login(){
+    let name=document.getElementById("name").value;
+    let studentClass=document.getElementById("class").value;
+    let password=document.getElementById("password").value;
+
+    if(name==""||studentClass==""||password==""){
+        alert("Please fill all fields!");
+        return;
+    }
+
+    document.getElementById("loginPage").classList.add("hidden");
+    document.getElementById("dashboard").classList.remove("hidden");
+
+    document.getElementById("studentName").innerText=name;
+    document.getElementById("studentClass").innerText=studentClass;
+
+    loadSchedule();
+}
+
+function logout(){
+    location.reload();
+}
+
+function loadSchedule(){
+    let list=document.getElementById("scheduleList");
+    list.innerHTML="";
+    schedules.forEach(item=>{
+        let div=document.createElement("div");
+        div.className="schedule-item";
+        div.innerHTML="⏰ "+item.time+" - "+item.subject;
+        list.appendChild(div);
+    });
+}
+
+function simulateChange(){
+    let notif=document.createElement("div");
+    notif.className="notification";
+    notif.innerHTML="🔔 English class moved to 10:30!";
+    document.getElementById("notificationArea").appendChild(notif);
+}
+
+function addHomework(){
+    let text=document.getElementById("hwText").value;
+    let time=document.getElementById("hwTime").value;
+
+    if(text==""||time==""){
+        alert("Fill homework and deadline!");
+        return;
+    }
+
+    let div=document.createElement("div");
+    div.className="schedule-item";
+    div.innerHTML="📌 "+text+" (Deadline: "+time+")";
+    document.getElementById("hwList").appendChild(div);
+
+    let deadline=new Date(time).getTime();
+    let now=new Date().getTime();
+    let delay=deadline-now;
+
+    if(delay>0){
+        setTimeout(()=>{
+            alert("Reminder: "+text+" is due!");
+        },delay);
+    }
+
+    document.getElementById("hwText").value="";
+    document.getElementById("hwTime").value="";
+}
+
+</script>
+
+</body>
+</html>
